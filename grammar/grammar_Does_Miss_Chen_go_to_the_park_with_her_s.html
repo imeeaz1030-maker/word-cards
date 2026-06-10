@@ -102,124 +102,156 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 <script>
 /* ===== 句子数据（英语喵分析后产出，填入这一个对象即可生成任意句子）===== */
 var sentence={
-  "text": "Let's take the key to the lost-property office.",
+  "text": "Does Miss Chen go to the park with her sister every night? No, she doesn't.",
   "chunks": [
     {
-      "text": "Let's",
-      "role": "祈使句引导",
-      "en": "Imperative Suggestion",
-      "note": "Let us 的缩写，表示\"让我们…\"，后面必须跟动词原形"
+      "text": "Does",
+      "role": "助动词（一般现在时疑问）",
+      "en": "Auxiliary",
+      "note": "问第三人称单数（she/he/it/单个人名）用 Does 开头，后面动词必须用原形。"
     },
     {
-      "text": "take",
-      "role": "动词原形",
-      "en": "Base Verb",
-      "note": "Let's 后的动词永远用原形！不加 -ing、不加 -s"
+      "text": "Miss Chen",
+      "role": "主语",
+      "en": "Subject",
+      "note": "句子在问谁——陈老师（第三人称单数）。"
     },
     {
-      "text": "the key",
-      "role": "宾语",
-      "en": "Object",
-      "note": "钥匙，被拿的物品"
+      "text": "go",
+      "role": "谓语动词（原形）",
+      "en": "Verb",
+      "note": "Does 已经表示第三人称单数了，所以动词用原形 go，不是 goes、更不是 going。"
     },
     {
-      "text": "to the lost-property office",
+      "text": "to the park",
       "role": "地点状语",
-      "en": "Place Adverbial",
-      "note": "去失物招领处，to 表示方向"
+      "en": "Adverbial (place)",
+      "note": "去哪儿——公园。"
+    },
+    {
+      "text": "with her sister",
+      "role": "伴随状语",
+      "en": "Adverbial (with)",
+      "note": "和谁一起——她妹妹。"
+    },
+    {
+      "text": "every night",
+      "role": "时间状语",
+      "en": "Adverbial (time)",
+      "note": "every night（每晚）是一般现在时的标志——经常性、习惯性的动作。"
+    },
+    {
+      "text": "No, she doesn't.",
+      "role": "否定回答",
+      "en": "Short answer",
+      "note": "用 Does 问，就用 does / doesn't 答。she 配 doesn't，不是 don't。"
     }
   ],
   "skeleton": {
-    "main": "Let's take the key.",
+    "main": "Does Miss Chen go to the park?",
     "parts": [
       {
-        "k": "Imperative Phrase 祈使引导",
-        "v": "Let's = Let us（让我们）"
+        "k": "Auxiliary 助动词",
+        "v": "Does"
       },
       {
-        "k": "Verb 动词",
-        "v": "take（拿，用原形！）"
+        "k": "Subject 主语",
+        "v": "Miss Chen"
       },
       {
-        "k": "Object 宾语",
-        "v": "the key（钥匙）"
+        "k": "Verb 谓语（原形）",
+        "v": "go"
       },
       {
-        "k": "Place 地点",
-        "v": "to the lost-property office（去失物招领处）"
+        "k": "Adverbial 状语",
+        "v": "to the park / with her sister / every night"
       }
     ],
     "plain": [
       {
-        "q": "谁做？",
-        "a": "Let's = 你和我（我们一起）"
+        "q": "问谁？",
+        "a": "Miss Chen"
       },
       {
         "q": "做什么？",
-        "a": "take the key（拿钥匙）"
+        "a": "go to the park（去公园）"
       },
       {
-        "q": "送到哪里？",
-        "a": "to the lost-property office（失物招领处）"
+        "q": "和谁？",
+        "a": "with her sister"
+      },
+      {
+        "q": "多久一次？",
+        "a": "every night（每晚）"
       }
     ]
   },
   "tense": {
-    "name": "祈使句 — Let's 句型（Imperative with Let's）",
-    "formula": "Let's + 动词原形 + 其他",
+    "name": "一般现在时（第三人称单数疑问句）",
+    "formula": "Does + 主语 + 动词原形 ... ?",
     "timeline": [
       {
-        "time": "现在",
-        "text": "Let's take the key. ← 建议现在就去做",
+        "time": "昨晚",
+        "text": "习惯性动作"
+      },
+      {
+        "time": "今晚",
+        "text": "还是这个习惯",
         "now": true
       },
       {
-        "time": "将来",
-        "text": "We will take the key later."
+        "time": "明晚",
+        "text": "仍然如此"
       }
     ],
     "contrast": [
-      "Let's 后面永远不能加 -ing！→ Let's taking ❌  Let's take ✅",
-      "Let's 后面也不能加 to → Let's to take ❌",
-      "为什么不用现在进行时？→ Let's 表示建议/提议去做某事，不是正在做",
-      "用现在进行时就是：We are taking the key.（正在拿钥匙）— 意思完全不同"
+      "不用 Does she going：Does 后面必须接动词原形 go，不能加 -ing。",
+      "不用 Do Miss Chen go：Miss Chen 是第三人称单数，要用 Does 不是 Do。",
+      "不用 Does she goes：三单的 -s 已经被 Does 拿走了，动词回到原形。",
+      "回答 No, she doesn't：Does 问 → does/doesn't 答，she 不配 don't。"
     ]
   },
   "errors": [
     {
-      "wrong": "Let's taking the key to the lost-property office.",
-      "type": "Let's + 动词形式错误",
-      "why": "Let's = Let us，后面必须跟动词原形。taking 是现在分词/动名词，不能跟在 Let's 后面。记住口诀：Let's + 动原，不加 -ing！",
-      "correct": "Let's take the key to the lost-property office."
+      "wrong": "Does Miss Chen going to the park with her sister every night?",
+      "type": "Does + 动词原形",
+      "why": "Does 后面动词必须用原形 go。going 是现在分词，用在 be 动词后面（is going），不能跟在 Does 后面。",
+      "correct": "Does Miss Chen go to the park with her sister every night?"
     },
     {
-      "wrong": "Let's to take the key to the lost-property office.",
-      "type": "Let's + 动词形式错误",
-      "why": "Let's 后面直接跟动词原形，不需要加 to。这是和 want to / like to 不同的地方。",
-      "correct": "Let's take the key to the lost-property office."
+      "wrong": "Do Miss Chen go to the park every night?",
+      "type": "三单用 Does",
+      "why": "Miss Chen 是一个人（第三人称单数），疑问句要用 Does 开头；Do 是给 I / you / we / they 用的。",
+      "correct": "Does Miss Chen go to the park every night?"
     },
     {
-      "wrong": "Let's takes the key to the lost-property office.",
-      "type": "Let's + 动词形式错误",
-      "why": "Let's 没有第三人称单数，后面永远用动词原形，即使主语看起来是单数。takes 是 He/She/It 用的，Let's 不用。",
-      "correct": "Let's take the key to the lost-property office."
+      "wrong": "Does Miss Chen goes to the park every night?",
+      "type": "动词形式重复",
+      "why": "三单的 -s 已经体现在 Does 上了，后面动词要变回原形 go，不能再用 goes。",
+      "correct": "Does Miss Chen go to the park every night?"
+    },
+    {
+      "wrong": "No, she don't.",
+      "type": "主谓搭配",
+      "why": "she 是第三人称单数，要配 doesn't；don't 是给 I / you / we / they 用的。",
+      "correct": "No, she doesn't."
     }
   ],
   "practice": [
     {
-      "q": "Let's ___ (go) to the park this afternoon.",
-      "answer": "go",
-      "hint": "Let's + 动词原形"
+      "q": "____ your brother ____ (play) football every day?",
+      "answer": "Does / play",
+      "hint": "your brother 是三单 → Does；Does 后动词用原形"
     },
     {
-      "q": "Let's ___ (play) football after school.",
-      "answer": "play",
-      "hint": "别加 -ing，直接放动词原形"
+      "q": "Does she ____ (watch) TV at night?",
+      "answer": "watch",
+      "hint": "Does 后面动词用原形，不是 watches"
     },
     {
-      "q": "___ (let) us ___ (clean) the classroom together.",
-      "answer": "Let / clean",
-      "hint": "Let us = Let's，后面跟动词原形"
+      "q": "Does Tom like apples? No, he ____.",
+      "answer": "doesn't",
+      "hint": "Does 问 → doesn't 答"
     }
   ]
 };
