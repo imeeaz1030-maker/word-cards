@@ -81,6 +81,14 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 .pr-fb.no{color:#e84a6f}
 .pr-fb .ans{font-weight:700}
 .footer{text-align:center;color:rgba(255,255,255,.75);font-size:12px;margin-top:8px}
+/* 原句可编辑 */
+.orig-label{font-size:13px;color:#999;margin-bottom:8px}
+.orig-input{width:100%;border:2px solid #e3e7ff;border-radius:12px;padding:12px 14px;font-size:18px;font-weight:700;color:#445;line-height:1.5;font-family:inherit;outline:none;resize:vertical}
+.orig-input:focus{border-color:#667eea}
+.orig-bar{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.orig-btn{border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:13px;padding:9px 14px;cursor:pointer}
+.orig-fb{font-size:12px;color:#11998e;font-weight:600}
+.orig-note{margin-top:10px;font-size:12px;color:#888;line-height:1.55;background:#f7f8ff;border-radius:10px;padding:9px 11px}
 </style>
 </head>
 <body>
@@ -340,9 +348,30 @@ function renderPractice(s){
   return c;
 }
 
+function renderOriginal(s){
+  var c=el("div","card");
+  c.appendChild(el("div","orig-label","原句 · 可以改成你自己的句子 ✏️"));
+  var ta=el("textarea","orig-input");ta.value=s.text;ta.rows=2;ta.setAttribute("spellcheck","false");
+  c.appendChild(ta);
+  var bar=el("div","orig-bar");
+  var btn=el("button","orig-btn","📋 复制这句发给英语喵");
+  var fb=el("span","orig-fb","");
+  bar.appendChild(btn);bar.appendChild(fb);
+  c.appendChild(bar);
+  c.appendChild(el("div","orig-note","💡 改了句子后，下面的拆解还是原来那句的。想要新句的完整拆解（点词 / 时态 / 错句 / 练习），点上面按钮复制，发给英语喵生成新页面。"));
+  btn.addEventListener("click",function(){
+    var t=ta.value.trim();if(!t){return;}
+    function done(){fb.textContent="已复制 ✓";setTimeout(function(){fb.textContent="";},2000);}
+    function fallback(){ta.focus();ta.select();try{document.execCommand("copy");done();}catch(e2){fb.textContent="请长按选中复制";}}
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback);}else{fallback();}}catch(e){fallback();}
+  });
+  return c;
+}
+
 function render(){
-  document.getElementById("app").innerHTML='<div class="card" style="text-align:center"><div style="font-size:13px;color:#999">原句</div><div style="font-size:19px;font-weight:700;color:#445;margin-top:6px;line-height:1.5">'+sentence.text+'</div></div>';
   var app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(renderOriginal(sentence));
   app.appendChild(renderChunks(sentence));
   app.appendChild(renderSkeleton(sentence));
   app.appendChild(renderTense(sentence));
