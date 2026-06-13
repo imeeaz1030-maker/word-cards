@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读实验室</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradient(135deg,#3a9d9d,#2c7a7b);min-height:100vh;color:#334;padding:18px 14px 40px}
+.wrap{max-width:600px;margin:0 auto}
+.header{text-align:center;color:#fff;margin:6px 0 12px}
+.header h1{font-size:21px;margin-bottom:3px}
+.header .h-cn{font-size:14px;opacity:.92}
+.header .sub{font-size:12px;opacity:.82;margin-top:3px}
+.nav{text-align:center;margin-bottom:14px}
+.navlink{display:inline-block;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:6px 13px;font-size:13px;margin:0 2px 4px}
+.card{background:#fff;border-radius:18px;padding:20px 18px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.card-tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,#3a9d9d,#2c7a7b);padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.card-tag.t2{background:linear-gradient(135deg,#f6a73c,#f08c3a)}
+.card-tag.t3{background:linear-gradient(135deg,#7e9cd8,#5a7bc4)}
+.card-tag.t4{background:linear-gradient(135deg,#e87a9a,#d65d86)}
+
+/* 全文逐句 */
+.tip{font-size:12px;color:#999;margin-bottom:10px}
+.para{margin-bottom:14px}
+.sent{display:block;font-size:16px;line-height:1.55;color:#234;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:3px;border:1px solid transparent;transition:all .15s}
+.sent:hover{background:#f0faf9}
+.sent.on{background:#e6f6f5;border-color:#a8ddd9}
+.sent .cn{display:none;font-size:13px;color:#2c7a7b;margin-top:5px;line-height:1.5}
+.sent.on .cn{display:block}
+.sent.hard{border-left:3px solid #f6a73c}
+.dive{display:inline-block;background:linear-gradient(135deg,#7e9cd8,#5a7bc4);color:#fff;text-decoration:none;border-radius:14px;padding:3px 11px;font-size:12px;font-weight:600;margin-top:6px}
+
+/* 生词 */
+.words{display:flex;flex-direction:column;gap:8px}
+.word{display:flex;align-items:baseline;gap:8px;padding:8px 10px;background:#f5faf9;border-radius:10px}
+.word .w{font-size:16px;font-weight:700;color:#2c7a7b}
+.word .ph{font-size:13px;color:#999}
+.word .wc{font-size:14px;color:#555;margin-left:auto}
+
+/* 段落大意 */
+.outline-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed #e5eeed;font-size:14px}
+.outline-item .p{color:#2c7a7b;font-weight:700;flex-shrink:0;min-width:48px}
+.outline-item .g{color:#555;line-height:1.6}
+.theme{margin-top:12px;background:#f0faf9;border-radius:10px;padding:12px 14px;font-size:14px;color:#2c7a7b;line-height:1.6;border:1px solid #cfeae7}
+.theme b{color:#1f5c5c}
+
+/* 阅读题 */
+.q{border:1px solid #e5eeed;border-radius:12px;padding:13px;margin-bottom:12px}
+.q-text{font-size:15px;color:#234;margin-bottom:10px;line-height:1.5}
+.opt{display:block;width:100%;text-align:left;background:#f7faf9;border:2px solid #eaf0ef;border-radius:10px;padding:10px 13px;font-size:14px;margin-bottom:7px;cursor:pointer;color:#445}
+.opt:hover{border-color:#a8ddd9}
+.opt.right{border-color:#43c59e;background:#e8f9f3;color:#1a7d5f}
+.opt.wrong{border-color:#e87a9a;background:#fdeef2;color:#b03a5e}
+.q-why{margin-top:8px;font-size:13px;color:#2c7a7b;min-height:16px;line-height:1.5}
+.footer{text-align:center;color:rgba(255,255,255,.82);font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="header">
+<h1 id="ptitle">📚 阅读实验室</h1>
+<div class="h-cn" id="ptitlecn"></div>
+<div class="sub">点句子看翻译 · 难句可深拆</div>
+</div>
+<div class="nav">
+<a class="navlink" href="./">📚 全部短文</a>
+<a class="navlink" href="../grammar/">🔬 句子实验室</a>
+<a class="navlink" href="../errors/">📕 错题本</a>
+<a class="navlink" href="../">📖 单词打卡</a>
+</div>
+<div id="app"></div>
+<div class="footer">喵老师 AI 家教 · 短文精读</div>
+</div>
+
+<script>
+/* ===== 短文数据（英语喵分析后产出，填入这一个对象即可生成任意短文）===== */
+var passage={
+  "title": "Our classroom building's shadow",
+  "title_cn": "我们教学楼的影子",
+  "paragraphs": [
+    [
+      {
+        "en": "Welcome to our school.",
+        "cn": "欢迎来到我们学校。"
+      },
+      {
+        "en": "There is a classroom building in it.",
+        "cn": "学校里有一栋教学楼。"
+      }
+    ],
+    [
+      {
+        "en": "In the morning, the sun rises in the east.",
+        "cn": "早晨，太阳从东方升起。"
+      },
+      {
+        "en": "Our classroom building's shadow is long.",
+        "cn": "我们教学楼的影子很长。"
+      },
+      {
+        "en": "It is behind the classroom building.",
+        "cn": "它在教学楼的后面。"
+      },
+      {
+        "en": "At noon, the sun is high in the sky.",
+        "cn": "正午，太阳高挂在天空。"
+      },
+      {
+        "en": "Our classroom building's shadow grows short.",
+        "cn": "我们教学楼的影子变短了。"
+      },
+      {
+        "en": "It's beside the classroom building.",
+        "cn": "它在教学楼的旁边。"
+      },
+      {
+        "en": "In the evening, the sun goes down in the west.",
+        "cn": "傍晚，太阳从西方落下。"
+      },
+      {
+        "en": "Our classroom building's shadow grows long again.",
+        "cn": "我们教学楼的影子又变长了。"
+      },
+      {
+        "en": "It's in front of the classroom building.",
+        "cn": "它在教学楼的前面。"
+      }
+    ],
+    [
+      {
+        "en": "How interesting the shadow is!",
+        "cn": "影子多有趣啊！",
+        "hard": true,
+        "dive_note": "How + 形容词 的感叹句"
+      }
+    ]
+  ],
+  "words": [
+    {
+      "w": "shadow",
+      "ph": "/ˈʃædoʊ/",
+      "cn": "影子"
+    },
+    {
+      "w": "rise",
+      "ph": "/raɪz/",
+      "cn": "升起"
+    },
+    {
+      "w": "east",
+      "ph": "/iːst/",
+      "cn": "东方"
+    },
+    {
+      "w": "noon",
+      "ph": "/nuːn/",
+      "cn": "正午"
+    },
+    {
+      "w": "grow",
+      "ph": "/ɡroʊ/",
+      "cn": "变得；生长"
+    },
+    {
+      "w": "beside",
+      "ph": "/bɪˈsaɪd/",
+      "cn": "在…旁边"
+    },
+    {
+      "w": "go down",
+      "ph": "/ɡoʊ daʊn/",
+      "cn": "落下"
+    },
+    {
+      "w": "west",
+      "ph": "/west/",
+      "cn": "西方"
+    },
+    {
+      "w": "in front of",
+      "ph": "/ɪn frʌnt əv/",
+      "cn": "在…前面"
+    }
+  ],
+  "outline": [
+    {
+      "p": "第1段",
+      "g": "欢迎来到学校，介绍这里有一栋教学楼。"
+    },
+    {
+      "p": "第2段",
+      "g": "教学楼的影子在一天中随太阳变化：早上太阳东升、影子长在后；正午太阳高、影子短在旁；傍晚太阳西落、影子又长在前。"
+    },
+    {
+      "p": "第3段",
+      "g": "感叹影子真有趣。"
+    }
+  ],
+  "theme": "通过一天中影子长短和方向的变化，说明影子和太阳位置的关系——太阳低则影子长，太阳高则影子短。",
+  "questions": [
+    {
+      "q": "Where is the shadow in the morning?（早上影子在哪里？）",
+      "options": [
+        "Beside the building（在旁边）",
+        "Behind the building（在后面）",
+        "In front of the building（在前面）"
+      ],
+      "answer": 1,
+      "why": "原文：In the morning... It is behind the classroom building."
+    },
+    {
+      "q": "When does the shadow grow short?（影子什么时候变短？）",
+      "options": [
+        "In the morning（早上）",
+        "At noon（正午）",
+        "In the evening（傍晚）"
+      ],
+      "answer": 1,
+      "why": "原文：At noon... shadow grows short. 太阳最高时影子最短。"
+    },
+    {
+      "q": "In the evening, the sun goes down in the ____.（傍晚太阳从哪边落下？）",
+      "options": [
+        "east（东）",
+        "west（西）",
+        "sky（天空）"
+      ],
+      "answer": 1,
+      "why": "原文：In the evening, the sun goes down in the west."
+    }
+  ]
+};
+
+/* ===== 渲染 ===== */
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+function renderText(p){
+  var c=el("div","card");
+  c.appendChild(el("div","card-tag","① 全文精读 · 点句看译"));
+  c.appendChild(el("div","tip","👆 点任意一句，看中文翻译；带橙边的是难句，可以深拆"));
+  for(var pi=0;pi<p.paragraphs.length;pi++){
+    var para=el("div","para");
+    for(var si=0;si<p.paragraphs[pi].length;si++){(function(s){
+      var sent=el("div","sent"+(s.hard?" hard":""));
+      sent.innerHTML='<span class="en">'+s.en+'</span><span class="cn">'+s.cn+(s.dive_note?'<br>📌 '+s.dive_note:'')+'</span>';
+      if(s.hard&&s.dive){var a=el("a","dive","🔬 深拆这句 →");a.href=s.dive;sent.querySelector(".cn").appendChild(document.createElement("br"));sent.querySelector(".cn").appendChild(a);}
+      sent.addEventListener("click",function(){sent.classList.toggle("on");});
+      para.appendChild(sent);
+    })(p.paragraphs[pi][si]);}
+    c.appendChild(para);
+  }
+  return c;
+}
+
+function renderWords(p){
+  var c=el("div","card");
+  c.appendChild(el("div","card-tag t2","② 生词表"));
+  var box=el("div","words");
+  for(var i=0;i<p.words.length;i++){
+    var w=p.words[i];
+    box.appendChild(el("div","word",'<span class="w">'+w.w+'</span><span class="ph">'+w.ph+'</span><span class="wc">'+w.cn+'</span>'));
+  }
+  c.appendChild(box);
+  return c;
+}
+
+function renderOutline(p){
+  var c=el("div","card");
+  c.appendChild(el("div","card-tag t3","③ 段落大意 · 抓结构"));
+  for(var i=0;i<p.outline.length;i++){
+    c.appendChild(el("div","outline-item",'<span class="p">'+p.outline[i].p+'</span><span class="g">'+p.outline[i].g+'</span>'));
+  }
+  if(p.theme)c.appendChild(el("div","theme",'<b>全文主旨：</b>'+p.theme));
+  return c;
+}
+
+function renderQuestions(p){
+  if(!p.questions||!p.questions.length)return null;
+  var c=el("div","card");
+  c.appendChild(el("div","card-tag t4","④ 阅读理解 · 检验"));
+  for(var i=0;i<p.questions.length;i++){(function(q,qi){
+    var box=el("div","q");
+    box.appendChild(el("div","q-text",(qi+1)+". "+q.q));
+    var why=el("div","q-why","");
+    for(var k=0;k<q.options.length;k++){(function(opt,oi){
+      var b=el("button","opt",opt);
+      b.addEventListener("click",function(){
+        var all=box.querySelectorAll(".opt");for(var m=0;m<all.length;m++)all[m].disabled=false;
+        if(oi===q.answer){b.classList.add("right");why.innerHTML="✓ 答对了！"+(q.why?"<br>"+q.why:"");}
+        else{b.classList.add("wrong");all[q.answer].classList.add("right");why.innerHTML="✗ 正确答案是 "+String.fromCharCode(65+q.answer)+"。"+(q.why?"<br>"+q.why:"");}
+      });
+      box.appendChild(b);
+    })(q.options[k],k);}
+    box.appendChild(why);
+    c.appendChild(box);
+  })(p.questions[i],i);}
+  return c;
+}
+
+function render(){
+  document.getElementById("ptitle").textContent="📚 "+passage.title;
+  document.getElementById("ptitlecn").textContent=passage.title_cn||"";
+  var app=document.getElementById("app");app.innerHTML="";
+  app.appendChild(renderText(passage));
+  app.appendChild(renderWords(passage));
+  app.appendChild(renderOutline(passage));
+  var q=renderQuestions(passage);if(q)app.appendChild(q);
+}
+render();
+</script>
+</body>
+</html>
