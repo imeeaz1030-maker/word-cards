@@ -82,6 +82,8 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 .pr-fb .ans{font-weight:700}
 .footer{text-align:center;color:rgba(255,255,255,.75);font-size:12px;margin-top:8px}
 .navlink{display:inline-block;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:6px 14px;font-size:13px;margin:0 3px}
+.speak-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:22px;padding:9px 22px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(102,126,234,.35)}
+.speak-btn:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -240,6 +242,8 @@ var sentence={
 /* ===== 渲染 ===== */
 function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
 
+function speak(text,rate){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=rate||0.85;speechSynthesis.speak(u);}catch(e){}}
+
 function renderChunks(s){
   var c=el("div","card");
   c.appendChild(el("div","card-tag","① 句子原文 · 点词看成分"));
@@ -252,6 +256,7 @@ function renderChunks(s){
       for(var k=0;k<all.length;k++)all[k].classList.remove("active");
       chip.classList.add("active");
       info.innerHTML='<div class="role">'+ch.role+'<span class="en">'+ch.en+'</span></div><div class="note">'+ch.note+'</div>';
+      speak(ch.text);
     });
     chips.appendChild(chip);
   })(s.chunks[i]);}
@@ -347,8 +352,13 @@ function renderPractice(s){
 }
 
 function render(){
-  document.getElementById("app").innerHTML='<div class="card" style="text-align:center"><div style="font-size:13px;color:#999">原句</div><div style="font-size:19px;font-weight:700;color:#445;margin-top:6px;line-height:1.5">'+sentence.text+'</div></div>';
-  var app=document.getElementById("app");
+  var app=document.getElementById("app");app.innerHTML="";
+  var oc=el("div","card");oc.style.textAlign="center";
+  oc.appendChild(el("div",null,'<div style="font-size:13px;color:#999">原句</div><div style="font-size:19px;font-weight:700;color:#445;margin:6px 0 12px;line-height:1.5">'+sentence.text+'</div>'));
+  var sb=el("button","speak-btn","🔊 朗读整句");
+  sb.addEventListener("click",function(){speak(sentence.text);});
+  oc.appendChild(sb);
+  app.appendChild(oc);
   app.appendChild(renderChunks(sentence));
   app.appendChild(renderSkeleton(sentence));
   app.appendChild(renderTense(sentence));
