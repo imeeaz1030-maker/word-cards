@@ -22,6 +22,8 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 
 /* 全文逐句 */
 .tip{font-size:12px;color:#999;margin-bottom:10px}
+.read-all-btn{background:linear-gradient(135deg,#3a9d9d,#2c7a7b);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:14px;font-weight:600;cursor:pointer;margin:0 0 10px;box-shadow:0 4px 10px rgba(44,122,123,.3)}
+.read-all-btn:active{transform:scale(.96)}
 .para{margin-bottom:14px}
 .sent{display:block;font-size:16px;line-height:1.55;color:#234;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:3px;border:1px solid transparent;transition:all .15s}
 .sent:hover{background:#f0faf9}
@@ -235,17 +237,26 @@ var passage={
 /* ===== 渲染 ===== */
 function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
 
+var _gvoice=null;
+function _pickVoice(){var vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}var pref=['Sonia','Daniel','Kate','Serena','Arthur','Google UK English Female','Google UK English Male'];for(var p=0;p<pref.length;p++)for(var i=0;i<vs.length;i++)if(vs[i].name&&vs[i].name.indexOf(pref[p])>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.replace('_','-').indexOf('en-GB')>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.indexOf('en')>=0)return vs[i];return null;}
+try{if(typeof speechSynthesis!=='undefined'){_gvoice=_pickVoice();speechSynthesis.onvoiceschanged=function(){_gvoice=_pickVoice();};}}catch(e){}
+function speak(text,rate){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);if(!_gvoice)_gvoice=_pickVoice();if(_gvoice)u.voice=_gvoice;u.lang=(_gvoice&&_gvoice.lang)?_gvoice.lang:'en-GB';u.rate=rate||0.95;u.pitch=1;setTimeout(function(){try{speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){}},60);}catch(e){}}
+function speakAll(p){var t="";for(var i=0;i<p.paragraphs.length;i++)for(var j=0;j<p.paragraphs[i].length;j++)t+=p.paragraphs[i][j].en+" ";speak(t.trim(),0.92);}
+
 function renderText(p){
   var c=el("div","card");
   c.appendChild(el("div","card-tag","① 全文精读 · 点句看译"));
-  c.appendChild(el("div","tip","👆 点任意一句，看中文翻译；带橙边的是难句，可以深拆"));
+  var rb=el("button","read-all-btn","🔊 朗读全文");
+  rb.addEventListener("click",function(){speakAll(p);});
+  c.appendChild(rb);
+  c.appendChild(el("div","tip","👆 点任意一句：看翻译 + 朗读这句；带橙边的是难句，可以深拆"));
   for(var pi=0;pi<p.paragraphs.length;pi++){
     var para=el("div","para");
     for(var si=0;si<p.paragraphs[pi].length;si++){(function(s){
       var sent=el("div","sent"+(s.hard?" hard":""));
       sent.innerHTML='<span class="en">'+s.en+'</span><span class="cn">'+s.cn+(s.dive_note?'<br>📌 '+s.dive_note:'')+'</span>';
       if(s.hard&&s.dive){var a=el("a","dive","🔬 深拆这句 →");a.href=s.dive;sent.querySelector(".cn").appendChild(document.createElement("br"));sent.querySelector(".cn").appendChild(a);}
-      sent.addEventListener("click",function(){sent.classList.toggle("on");});
+      sent.addEventListener("click",function(){sent.classList.toggle("on");speak(s.en);});
       para.appendChild(sent);
     })(p.paragraphs[pi][si]);}
     c.appendChild(para);
