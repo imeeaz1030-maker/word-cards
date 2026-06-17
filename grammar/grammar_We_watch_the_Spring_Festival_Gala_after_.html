@@ -206,7 +206,10 @@ var sentence={
 /* ===== 渲染 ===== */
 function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
 
-function speak(text,rate){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=rate||0.85;speechSynthesis.speak(u);}catch(e){}}
+var _gvoice=null;
+function _pickVoice(){var vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}var pref=['Sonia','Daniel','Kate','Serena','Arthur','Google UK English Female','Google UK English Male'];for(var p=0;p<pref.length;p++)for(var i=0;i<vs.length;i++)if(vs[i].name&&vs[i].name.indexOf(pref[p])>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.replace('_','-').indexOf('en-GB')>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.indexOf('en')>=0)return vs[i];return null;}
+try{if(typeof speechSynthesis!=='undefined'){_gvoice=_pickVoice();speechSynthesis.onvoiceschanged=function(){_gvoice=_pickVoice();};}}catch(e){}
+function speak(text,rate){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);if(!_gvoice)_gvoice=_pickVoice();if(_gvoice)u.voice=_gvoice;u.lang=(_gvoice&&_gvoice.lang)?_gvoice.lang:'en-GB';u.rate=rate||0.95;u.pitch=1;setTimeout(function(){try{speechSynthesis.speak(u);}catch(e){}},60);}catch(e){}}
 
 function renderChunks(s){
   var c=el("div","card");
