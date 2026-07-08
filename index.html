@@ -2,154 +2,158 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>单词打卡</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;color:#fff}
-.header{text-align:center;margin-bottom:15px;margin-top:10px}
-.header h1{font-size:22px;margin-bottom:6px}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333;padding:18px 14px 100px}
+.wrap{max-width:480px;margin:0 auto}
+.header{text-align:center;color:#fff;margin:6px 0 18px}
+.header h1{font-size:22px;margin-bottom:4px}
+.header .sub{font-size:13px;opacity:.9}
 .progress{font-size:13px;opacity:.9}
-.tabs{display:flex;gap:0;background:rgba(255,255,255,.15);border-radius:30px;padding:4px;margin-bottom:15px}
-.tab{padding:10px 25px;border:none;background:transparent;color:#fff;cursor:pointer;font-size:14px;font-weight:600;border-radius:25px;transition:all .2s}
-.tab.active{background:#fff;color:#667eea}
-.mode{display:none;width:100%;max-width:420px;flex-direction:column;align-items:center}
-.mode.active{display:flex}
-.card-container{perspective:1000px;width:100%;height:280px;margin:10px 0}
-.card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s;cursor:pointer}
-.card.flipped{transform:rotateY(180deg)}
-.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;background:#fff;color:#333;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center}
-.card-back{transform:rotateY(180deg);background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:#fff}
-.word{font-size:42px;font-weight:bold;margin-bottom:12px}
-.phonetic{font-size:18px;color:#888;margin-bottom:15px}
-.card-back .phonetic{color:rgba(255,255,255,.85)}
-.pos{font-size:14px;color:#999;margin-bottom:8px}
-.card-back .pos{color:rgba(255,255,255,.8)}
-.meaning{font-size:28px;font-weight:600;margin-bottom:15px}
-.example{font-size:14px;line-height:1.5;padding:0 10px;opacity:.95}
-.hint{position:absolute;bottom:12px;font-size:11px;opacity:.5}
-.fav-btn{position:absolute;top:15px;right:15px;background:none;border:none;font-size:32px;cursor:pointer;z-index:10;color:#bbb;line-height:1}
-.fav-btn.on{color:#ff4757}
-.speak-btn{position:absolute;top:15px;left:15px;background:#667eea;border:none;width:38px;height:38px;border-radius:50%;cursor:pointer;z-index:10;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center}
-.card-back .speak-btn{background:rgba(255,255,255,.3)}
-.controls{display:flex;gap:10px;margin:15px 0 10px 0;flex-wrap:wrap;justify-content:center}
-.btn{padding:12px 22px;border:none;border-radius:25px;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:#667eea;box-shadow:0 4px 15px rgba(0,0,0,.15);min-width:80px}
-.btn-pri{background:linear-gradient(135deg,#ffd89b,#19547b);color:#fff}
-.btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff}
-.btn-warning{background:linear-gradient(135deg,#fa709a,#fee140);color:#fff;width:100%;margin-top:10px}
-.btn-danger{background:#ff4757;color:#fff}
-.view-fav{margin-top:15px;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.5)}
-.spell-card{background:#fff;color:#333;border-radius:20px;padding:30px 25px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center;margin-bottom:15px;position:relative}
-.spell-card.review-mode{background:linear-gradient(135deg,#fff5f5,#ffe8eb);border:2px solid #ff4757}
-.spell-speak{position:absolute;top:15px;right:15px;background:#667eea;border:none;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center}
-.review-badge{position:absolute;top:15px;left:15px;background:#ff4757;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;display:none}
-.spell-card.review-mode .review-badge{display:block}
-.spell-meaning{font-size:32px;font-weight:bold;color:#333;margin-bottom:8px}
-.spell-pos{font-size:14px;color:#999;margin-bottom:10px}
-.spell-phonetic{font-size:16px;color:#888;margin-bottom:20px}
-.spell-prompt{font-size:14px;color:#666;margin-bottom:12px}
-.spell-input{width:100%;padding:14px 18px;font-size:20px;border:2px solid #e0e0e0;border-radius:12px;outline:none;text-align:center;letter-spacing:1px}
-.spell-input:focus{border-color:#667eea}
-.spell-input.correct{border-color:#43e97b;background:#e8f9ee}
-.spell-input.wrong{border-color:#ff4757;background:#ffe8eb}
-.spell-feedback{margin-top:15px;font-size:15px;min-height:24px;font-weight:600}
-.spell-feedback.correct{color:#43e97b}
-.spell-feedback.wrong{color:#ff4757}
-.spell-stats{margin-top:12px;font-size:13px;color:#888}
-.spell-stats .wrong-count{color:#ff4757;font-weight:600}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;padding:20px}
-.modal.show{display:flex}
-.modal-content{background:#fff;border-radius:20px;padding:25px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto;color:#333}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid #f0f0f0;padding-bottom:12px}
-.modal-header h2{font-size:18px}
-.close-btn{background:none;border:none;font-size:24px;cursor:pointer;color:#999}
-.fav-list{list-style:none}
-.fav-item{display:flex;justify-content:space-between;align-items:center;padding:12px 8px;border-bottom:1px solid #f0f0f0}
-.fav-word strong{display:block;font-size:16px;color:#333}
-.fav-word span{font-size:13px;color:#666}
-.remove-btn{background:#ff4757;color:#fff;border:none;padding:6px 12px;border-radius:15px;font-size:12px;cursor:pointer}
-.empty-state{text-align:center;padding:30px;color:#999}
-.footer{margin-top:15px;font-size:12px;opacity:.7;text-align:center}
-.btn-reviewed{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;width:100%;margin-top:10px}
-.spell-card.reviewed-mode{background:linear-gradient(135deg,#f0fff4,#e8f9ee);border:2px solid #43e97b}
-.reviewed-badge{position:absolute;top:15px;left:15px;background:#43e97b;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;display:none}
-.spell-card.reviewed-mode .reviewed-badge{display:block}
+.tabs{display:flex;gap:6px;margin-bottom:16px;justify-content:center}
+.tab{flex:1;max-width:160px;padding:10px;border-radius:30px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:.3s;color:#fff;background:rgba(255,255,255,.2)}
+.tab.active{background:#fff;color:#667eea;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.card{background:#fff;border-radius:24px;padding:28px 22px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);transition:.3s;cursor:pointer;position:relative;min-height:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;perspective:1000px}
+.card-inner{width:100%;transition:.5s;transform-style:preserve-3d;position:relative}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.card-front,.card-back{backface-visibility:hidden;width:100%}
+.card-back{position:absolute;top:0;left:0;transform:rotateY(180deg)}
+.card .word{font-size:28px;font-weight:700;color:#222;margin-bottom:8px;text-align:center}
+.card .phonetic{font-size:15px;color:#888;margin-bottom:6px;text-align:center}
+.card .pos{font-size:13px;color:#667eea;font-weight:600;display:inline-block;margin-bottom:4px}
+.card .meaning{font-size:22px;color:#333;margin:10px 0 6px;text-align:center}
+.card .example{font-size:14px;color:#999;font-style:italic;text-align:center;margin-top:8px;line-height:1.5}
+.card .hint{font-size:13px;color:#bbb;text-align:center;margin-top:14px}
+.nav{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.nav button{padding:10px 18px;border:none;border-radius:30px;font-size:14px;cursor:pointer;transition:.3s;color:#fff;font-weight:600;background:rgba(255,255,255,.2)}
+.nav button:hover{background:rgba(255,255,255,.35)}
+.nav button:active{transform:scale(.95)}
+.spell-card{background:#fff;border-radius:24px;padding:24px 20px;box-shadow:0 10px 30px rgba(0,0,0,.18);margin-bottom:16px}
+.spell-card .prompt{font-size:16px;color:#888;margin-bottom:8px}
+.spell-card .scard-word{font-size:26px;font-weight:700;color:#222;margin-bottom:4px}
+.spell-card .scard-meaning{font-size:22px;color:#333;margin-bottom:12px;text-align:center}
+.spell-card .scard-extra{font-size:15px;color:#888;margin-bottom:14px;text-align:center}
+.spell-card .input-row{display:flex;gap:8px;margin-bottom:10px}
+.spell-card input{flex:1;padding:14px 16px;border:2px solid #ddd;border-radius:16px;font-size:17px;outline:none;transition:.3s}
+.spell-card input:focus{border-color:#667eea}
+.spell-card input.correct{border-color:#38ef7d;background:#f0fff4}
+.spell-card input.wrong{border-color:#ff6b6b;background:#fff5f5}
+.spell-card .spell-feedback{text-align:center;font-size:15px;min-height:28px;margin-top:4px}
+.spell-card .spell-feedback.correct{color:#11998e}
+.spell-card .spell-feedback.wrong{color:#e74c3c}
+.spell-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.spell-actions button{flex:1;min-width:80px;padding:12px;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;transition:.3s;color:#fff}
+.spell-actions button:active{transform:scale(.95)}
+.btn-submit{background:linear-gradient(135deg,#667eea,#764ba2)}
+.btn-skip{background:linear-gradient(135deg,#f7971e,#ffd200);color:#5a4500!important}
+.btn-next{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.btn-speak{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.btn-review{background:linear-gradient(135deg,#fa709a,#fee140);color:#7a2438!important}
+.stats{display:flex;gap:16px;justify-content:center;margin-bottom:18px;color:#fff;font-size:13px}
+.stats span{background:rgba(255,255,255,.15);padding:6px 14px;border-radius:20px}
+.speak-btn{position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#667eea;z-index:5;padding:4px 8px;border-radius:12px}
+.speak-btn:hover{background:rgba(102,126,234,.1)}
+.speak-btn:active{transform:scale(.9)}
+.fav-btn{position:absolute;top:12px;left:16px;background:none;border:none;font-size:22px;cursor:pointer;z-index:5;padding:4px 8px;border-radius:12px;transition:.3s}
+.fav-btn:hover{transform:scale(1.2)}
+.fav-btn.active{animation:heartBeat .4s}
+@keyframes heartBeat{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+.review-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;color:#fff;font-size:12px;margin-bottom:12px}
+.review-badge .num{font-weight:700;font-size:16px}
+.footer-nav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.footer-nav button{padding:8px 16px;border:none;border-radius:20px;font-size:13px;cursor:pointer;transition:.3s;color:#fff;background:rgba(255,255,255,.15)}
+.footer-nav button:active{transform:scale(.95)}
+.mode-indicator{text-align:center;color:#fff;font-size:13px;margin-bottom:8px;padding:6px;border-radius:12px;background:rgba(255,255,255,.12)}
+.resume-bar{text-align:center;color:#fff;font-size:13px;margin-bottom:10px;padding:8px 12px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.3s}
+.resume-bar:hover{background:rgba(255,255,255,.25)}
+.resume-bar .resume-btn{background:#fff;border:none;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:#667eea;cursor:pointer}
+#spellCard{display:none}
+#spellCard.active{display:block}
+#browseCard,#spellCard,#reviewCard{transition:.3s}
 </style>
 </head>
 <body>
+<div class="wrap">
 <div class="header">
 <h1>单词打卡</h1>
-<div class="progress" id="progressInfo">第 <span id="cur">1</span> / <span id="tot">8</span> 个</div>
+<div class="sub" id="cardTitle">112 个不规则动词过去式</div>
+<div class="progress" id="progressInfo">第 <span id="cur">1</span> / <span id="tot">112</span> 个</div>
 </div>
+
+<div id="resumeBar" class="resume-bar" style="display:none" onclick="jumpToSaved()">
+  📍 上次学到 <span id="resumeWord"></span>
+  <span class="resume-btn">继续 ›</span>
+</div>
+
 <div class="tabs">
-<button class="tab active" id="tabBrowse">浏览模式</button>
-<button class="tab" id="tabSpell">拼写模式</button>
+<button class="tab active" id="tabBrowse" onclick="switchTab('browse')">👀 浏览</button>
+<button class="tab" id="tabSpell" onclick="switchTab('spell')">✍️ 拼写</button>
 </div>
 
-<div class="mode active" id="modeBrowse">
-<div class="card-container">
-<div class="card" id="card">
-<div class="card-face card-front">
-<button class="speak-btn" id="speakBtn1">♪</button>
-<button class="fav-btn" id="favBtn">♡</button>
-<div class="word" id="word">apple</div>
-<div class="phonetic" id="phonetic">/aepl/</div>
-<div class="pos" id="pos">n.</div>
-<div class="hint">点击翻转</div>
+<div class="stats">
+<span>已答对: <strong id="sCorrect">0</strong></span>
+<span>共答: <strong id="sTotal">0</strong></span>
+<span>错词: <strong id="sWrong">0</strong></span>
 </div>
-<div class="card-face card-back">
-<button class="speak-btn" id="speakBtn2">♪</button>
-<div class="pos" id="pos2">n.</div>
-<div class="meaning" id="meaning">苹果</div>
-<div class="example" id="example">An apple a day keeps the doctor away.</div>
-<div class="hint">点击翻回</div>
+
+<div id="browseCard">
+<div class="card" id="card" onclick="flip()">
+<button class="speak-btn" onclick="event.stopPropagation();speak(words[idx]?.['word']||'')" title="发音">♪</button>
+<button class="fav-btn" id="favBtn" onclick="toggleFav(event)" title="收藏">♡</button>
+<div class="card-inner">
+<div class="card-front">
+<div class="word" id="word">was / were</div>
+<div class="phonetic" id="phonetic">/wʌz/ /wɜːr/</div>
+<div class="pos" id="pos">v.</div>
+<div class="hint">👆 点击翻转看释义</div>
+</div>
+<div class="card-back">
+<div class="meaning" id="meaning">是（be的过去式）</div>
+<div class="pos" id="pos2">v.</div>
+<div class="example" id="example">I was happy yesterday.</div>
+<button class="speak-btn" style="position:static;margin-top:10px;font-size:18px" onclick="event.stopPropagation();speak(words[idx]?.example||'')">🔊 读例句</button>
 </div>
 </div>
 </div>
-<div class="controls">
-<button class="btn" id="btnPrev">上一个</button>
-<button class="btn btn-pri" id="btnRandom">随机</button>
-<button class="btn" id="btnNext">下一个</button>
+<div class="nav">
+<button onclick="prev()">◀ 上一个</button>
+<button onclick="rand()">🎲 随机</button>
+<button onclick="next()">下一个 ▶</button>
+</div>
+<div class="footer-nav">
+<button onclick="resetAll()">🔄 重置进度</button>
 </div>
 </div>
 
-<div class="mode" id="modeSpell">
-<div class="spell-card" id="spellCard">
-<div class="review-badge">错词专项</div>
-<div class="reviewed-badge">已复习专练</div>
-<button class="spell-speak" id="spellSpeakBtn">♪</button>
-<div class="spell-meaning" id="sMeaning">苹果</div>
-<div class="spell-pos" id="sPos">n.</div>
-<div class="spell-phonetic" id="sPhonetic">/aepl/</div>
-<div class="spell-prompt">请拼写这个单词(点♪听发音)</div>
-<input type="text" class="spell-input" id="spellInput" placeholder="输入单词..." autocomplete="off" autocapitalize="off" spellcheck="false">
+<div id="spellCard" class="active">
+<div class="mode-indicator" id="modeIndicator">✍️ 拼写模式</div>
+<div class="spell-card">
+<div class="scard-meaning" id="sMeaning">是（be的过去式）</div>
+<div class="scard-extra" id="sPhonetic">/wʌz/ /wɜːr/</div>
+<div class="scard-extra" id="sPos">v.</div>
+<div class="input-row">
+<input type="text" id="spellInput" placeholder="输入英语..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+</div>
 <div class="spell-feedback" id="sFeedback"></div>
-<div class="spell-stats" id="spellStats">已答对 <span id="sCorrect">0</span> / 共 <span id="sTotal">0</span> · <span class="wrong-count">错词 <span id="sWrong">0</span></span></div>
+<div class="spell-actions">
+<button class="btn-submit" onclick="submitSpell()">✓ 提交</button>
+<button class="btn-speak" onclick="speak(words[spellIdx]?.meaning||'')">🔊 听中文</button>
 </div>
-<div class="controls">
-<button class="btn btn-success" id="btnSubmit">提交</button>
-<button class="btn" id="btnSkip">跳过</button>
-<button class="btn btn-pri" id="btnSpellNext">下一个</button>
+<div class="spell-actions" style="margin-top:6px">
+<button class="btn-skip" onclick="skipSpell()">⏭ 跳过</button>
+<button class="btn-next" onclick="spellNext()" id="btnNextWord">➡ 下一词</button>
 </div>
-<button class="btn btn-warning" id="btnReview">错词专项练习 (<span id="reviewCount">0</span>)</button>
-<button class="btn btn-warning" id="btnExitReview" style="display:none">退出错词专项</button>
-<button class="btn btn-reviewed" id="btnReviewed">已复习单词 (<span id="reviewedCount">0</span>)</button>
-<button class="btn btn-reviewed" id="btnExitReviewed" style="display:none">退出已复习专练</button>
+<div class="spell-actions" style="margin-top:8px">
+<button class="btn-review" onclick="enterReviewMode()" id="btnReview">📕 错词专项 (<span id="reviewCount">0</span>)</button>
+<button class="btn-review" onclick="exitReviewMode()" id="btnExitReview" style="display:none">🔙 退出错词</button>
 </div>
-
-<button class="btn view-fav" id="btnViewFav">查看生词本 (<span id="favCount">0</span>)</button>
-<a class="btn view-fav" href="grammar/" style="text-decoration:none;display:block;text-align:center">🔬 去句子实验室（练语法）</a>
-<a class="btn view-fav" href="errors/" style="text-decoration:none;display:block;text-align:center">📕 错题本（错题拆解）</a>
-<a class="btn view-fav" href="reading/" style="text-decoration:none;display:block;text-align:center">📚 阅读实验室（短文精读）</a>
-<div class="footer">喵老师 AI 家教</div>
-
-<div class="modal" id="modal">
-<div class="modal-content">
-<div class="modal-header">
-<h2>我的生词本</h2>
-<button class="close-btn" id="btnClose">x</button>
+<div class="spell-actions">
+<button class="btn-review" onclick="enterReviewedMode()" id="btnReviewed">✅ 已复习专练 (<span id="reviewedCount">0</span>)</button>
+<button class="btn-review" onclick="exitReviewedMode()" id="btnExitReviewed" style="display:none">🔙 退出已复习</button>
 </div>
-<ul class="fav-list" id="favList"></ul>
+</div>
 </div>
 </div>
 
@@ -158,6 +162,8 @@ var CARD_KEY="4B总归纳卡";
 var WRONG_STORE="flashcard_wrong_"+CARD_KEY;
 var REVIEWED_STORE="flashcard_reviewed_"+CARD_KEY;
 var FAV_KEY="flashcard_favs_"+CARD_KEY;
+var CUR_IDX_KEY="flashcard_curidx_"+CARD_KEY;
+var SPELL_IDX_KEY="flashcard_spellidx_"+CARD_KEY;
 var words=[{"word": "was / were", "phonetic": "/wʌz/ /wɜːr/", "pos": "v.", "meaning": "是（be的过去式）", "example": "I was happy yesterday."}, {"word": "beat", "phonetic": "/biːt/", "pos": "v.", "meaning": "击打（过去式）", "example": "He beat the drum."}, {"word": "became", "phonetic": "/bɪˈkeɪm/", "pos": "v.", "meaning": "变成（become的过去式）", "example": "She became a teacher."}, {"word": "began", "phonetic": "/bɪˈɡæn/", "pos": "v.", "meaning": "开始（begin的过去式）", "example": "The class began at 8 o'clock."}, {"word": "bent", "phonetic": "/bɛnt/", "pos": "v.", "meaning": "使弯曲（bend的过去式）", "example": "He bent down to pick it up."}, {"word": "bet", "phonetic": "/bɛt/", "pos": "v.", "meaning": "赌（过去式）", "example": "I bet you can do it."}, {"word": "bit", "phonetic": "/bɪt/", "pos": "v.", "meaning": "咬（bite的过去式）", "example": "The dog bit the bone."}, {"word": "blew", "phonetic": "/bluː/", "pos": "v.", "meaning": "吹（blow的过去式）", "example": "The wind blew the leaves."}, {"word": "broke", "phonetic": "/broʊk/", "pos": "v.", "meaning": "打破（break的过去式）", "example": "I broke the glass."}, {"word": "brought", "phonetic": "/brɔːt/", "pos": "v.", "meaning": "拿来（bring的过去式）", "example": "He brought his book."}, {"word": "built", "phonetic": "/bɪlt/", "pos": "v.", "meaning": "建造（build的过去式）", "example": "They built a new house."}, {"word": "burnt / burned", "phonetic": "/bɜːrnt/ /bɜːrnd/", "pos": "v.", "meaning": "燃烧（burn的过去式）", "example": "The paper burnt quickly."}, {"word": "bought", "phonetic": "/bɔːt/", "pos": "v.", "meaning": "买（buy的过去式）", "example": "I bought a new toy."}, {"word": "could", "phonetic": "/kʊd/", "pos": "v.", "meaning": "能（can的过去式）", "example": "I could swim when I was five."}, {"word": "caught", "phonetic": "/kɔːt/", "pos": "v.", "meaning": "捕捉（catch的过去式）", "example": "He caught the ball."}, {"word": "chose", "phonetic": "/tʃoʊz/", "pos": "v.", "meaning": "选择（choose的过去式）", "example": "She chose a red dress."}, {"word": "came", "phonetic": "/keɪm/", "pos": "v.", "meaning": "来（come的过去式）", "example": "My friend came to my house."}, {"word": "cost", "phonetic": "/kɔːst/", "pos": "v.", "meaning": "花费（过去式）", "example": "The book cost 20 yuan."}, {"word": "cut", "phonetic": "/kʌt/", "pos": "v.", "meaning": "割（过去式）", "example": "I cut the paper."}, {"word": "dug", "phonetic": "/dʌɡ/", "pos": "v.", "meaning": "挖（dig的过去式）", "example": "The dog dug a hole."}, {"word": "did", "phonetic": "/dɪd/", "pos": "v.", "meaning": "做（do的过去式）", "example": "I did my homework."}, {"word": "drew", "phonetic": "/druː/", "pos": "v.", "meaning": "画（draw的过去式）", "example": "She drew a picture."}, {"word": "dreamed / dreamt", "phonetic": "/driːmd/ /drɛmt/", "pos": "v.", "meaning": "做梦（dream的过去式）", "example": "I dreamed about my cat."}, {"word": "drank", "phonetic": "/dræŋk/", "pos": "v.", "meaning": "喝（drink的过去式）", "example": "He drank some water."}, {"word": "drove", "phonetic": "/droʊv/", "pos": "v.", "meaning": "驾驶（drive的过去式）", "example": "My dad drove me to school."}, {"word": "ate", "phonetic": "/eɪt/", "pos": "v.", "meaning": "吃（eat的过去式）", "example": "I ate an apple."}, {"word": "fell", "phonetic": "/fɛl/", "pos": "v.", "meaning": "掉落（fall的过去式）", "example": "The book fell on the floor."}, {"word": "fed", "phonetic": "/fɛd/", "pos": "v.", "meaning": "喂（feed的过去式）", "example": "I fed my cat."}, {"word": "felt", "phonetic": "/fɛlt/", "pos": "v.", "meaning": "触摸/感觉（feel的过去式）", "example": "I felt happy."}, {"word": "fought", "phonetic": "/fɔːt/", "pos": "v.", "meaning": "作战（fight的过去式）", "example": "They fought bravely."}, {"word": "found", "phonetic": "/faʊnd/", "pos": "v.", "meaning": "找出（find的过去式）", "example": "I found my pencil."}, {"word": "flew", "phonetic": "/fluː/", "pos": "v.", "meaning": "飞（fly的过去式）", "example": "The bird flew away."}, {"word": "forgot", "phonetic": "/fərˈɡɑːt/", "pos": "v.", "meaning": "忘记（forget的过去式）", "example": "I forgot my book."}, {"word": "forgave", "phonetic": "/fərˈɡeɪv/", "pos": "v.", "meaning": "原谅（forgive的过去式）", "example": "She forgave me."}, {"word": "froze", "phonetic": "/froʊz/", "pos": "v.", "meaning": "结冰（freeze的过去式）", "example": "The water froze."}, {"word": "got", "phonetic": "/ɡɑːt/", "pos": "v.", "meaning": "得到（get的过去式）", "example": "I got a present."}, {"word": "gave", "phonetic": "/ɡeɪv/", "pos": "v.", "meaning": "给（give的过去式）", "example": "She gave me a gift."}, {"word": "went", "phonetic": "/wɛnt/", "pos": "v.", "meaning": "去（go的过去式）", "example": "I went to the park."}, {"word": "grew", "phonetic": "/ɡruː/", "pos": "v.", "meaning": "成长（grow的过去式）", "example": "The tree grew tall."}, {"word": "hung / hanged", "phonetic": "/hʌŋ/ /hæŋd/", "pos": "v.", "meaning": "挂/绞死（hang的过去式）", "example": "I hung the picture on the wall."}, {"word": "had", "phonetic": "/hæd/", "pos": "v.", "meaning": "有（have的过去式）", "example": "I had a good time."}, {"word": "heard", "phonetic": "/hɜːrd/", "pos": "v.", "meaning": "听到（hear的过去式）", "example": "I heard a noise."}, {"word": "hid", "phonetic": "/hɪd/", "pos": "v.", "meaning": "隐藏（hide的过去式）", "example": "The cat hid under the bed."}, {"word": "hit", "phonetic": "/hɪt/", "pos": "v.", "meaning": "打（过去式）", "example": "He hit the ball hard."}, {"word": "held", "phonetic": "/hɛld/", "pos": "v.", "meaning": "拿住（hold的过去式）", "example": "She held my hand."}, {"word": "hurt", "phonetic": "/hɜːrt/", "pos": "v.", "meaning": "受伤（过去式）", "example": "I hurt my leg."}, {"word": "kept", "phonetic": "/kɛpt/", "pos": "v.", "meaning": "保持（keep的过去式）", "example": "I kept the secret."}, {"word": "knew", "phonetic": "/njuː/", "pos": "v.", "meaning": "知道（know的过去式）", "example": "I knew the answer."}, {"word": "laid", "phonetic": "/leɪd/", "pos": "v.", "meaning": "放置（lay的过去式）", "example": "She laid the book on the desk."}, {"word": "led", "phonetic": "/lɛd/", "pos": "v.", "meaning": "引导（lead的过去式）", "example": "He led us to the classroom."}, {"word": "learnt / learned", "phonetic": "/lɜːrnt/ /lɜːrnd/", "pos": "v.", "meaning": "学习（learn的过去式）", "example": "I learnt English at school."}, {"word": "left", "phonetic": "/lɛft/", "pos": "v.", "meaning": "离开（leave的过去式）", "example": "She left the room."}, {"word": "lent", "phonetic": "/lɛnt/", "pos": "v.", "meaning": "借出（lend的过去式）", "example": "I lent him my pen."}, {"word": "let", "phonetic": "/lɛt/", "pos": "v.", "meaning": "让（过去式）", "example": "My mum let me go out."}, {"word": "lay", "phonetic": "/leɪ/", "pos": "v.", "meaning": "躺（lie的过去式）", "example": "I lay on the bed."}, {"word": "lit / lighted", "phonetic": "/lɪt/ /ˈlaɪtɪd/", "pos": "v.", "meaning": "点着（light的过去式）", "example": "I lit the candle."}, {"word": "lost", "phonetic": "/lɔːst/", "pos": "v.", "meaning": "遗失（lose的过去式）", "example": "I lost my key."}, {"word": "made", "phonetic": "/meɪd/", "pos": "v.", "meaning": "制作（make的过去式）", "example": "I made a model plane."}, {"word": "might", "phonetic": "/maɪt/", "pos": "v.", "meaning": "可以（may的过去式）", "example": "I thought I might be late."}, {"word": "meant", "phonetic": "/mɛnt/", "pos": "v.", "meaning": "意思是（mean的过去式）", "example": "I meant to help you."}, {"word": "met", "phonetic": "/mɛt/", "pos": "v.", "meaning": "遇到（meet的过去式）", "example": "I met my friend at the park."}, {"word": "mistook", "phonetic": "/mɪˈstʊk/", "pos": "v.", "meaning": "误认（mistake的过去式）", "example": "I mistook her for my sister."}, {"word": "paid", "phonetic": "/peɪd/", "pos": "v.", "meaning": "支付（pay的过去式）", "example": "I paid for the book."}, {"word": "proved", "phonetic": "/pruːvd/", "pos": "v.", "meaning": "证明（过去式）", "example": "He proved he was right."}, {"word": "put", "phonetic": "/pʊt/", "pos": "v.", "meaning": "放置（过去式）", "example": "I put the book on the desk."}, {"word": "quit / quitted", "phonetic": "/kwɪt/ /ˈkwɪtɪd/", "pos": "v.", "meaning": "放弃（过去式）", "example": "He quit the game."}, {"word": "read", "phonetic": "/rɛd/", "pos": "v.", "meaning": "读（read的过去式）", "example": "I read a book last night."}, {"word": "rebuilt", "phonetic": "/riːˈbɪlt/", "pos": "v.", "meaning": "改建（rebuild的过去式）", "example": "They rebuilt the house."}, {"word": "retold", "phonetic": "/riːˈtoʊld/", "pos": "v.", "meaning": "复述（retell的过去式）", "example": "I retold the story."}, {"word": "rid / ridded", "phonetic": "/rɪd/ /ˈrɪdɪd/", "pos": "v.", "meaning": "免除（过去式）", "example": "I got rid of the old toys."}, {"word": "rode", "phonetic": "/roʊd/", "pos": "v.", "meaning": "骑（ride的过去式）", "example": "I rode a bike."}, {"word": "rose", "phonetic": "/roʊz/", "pos": "v.", "meaning": "上升（rise的过去式）", "example": "The sun rose at 6 o'clock."}, {"word": "ran", "phonetic": "/ræn/", "pos": "v.", "meaning": "跑（run的过去式）", "example": "I ran to school."}, {"word": "said", "phonetic": "/sɛd/", "pos": "v.", "meaning": "说（say的过去式）", "example": "She said hello to me."}, {"word": "saw", "phonetic": "/sɔː/", "pos": "v.", "meaning": "看（see的过去式）", "example": "I saw a bird in the tree."}, {"word": "sought", "phonetic": "/sɔːt/", "pos": "v.", "meaning": "寻觅（seek的过去式）", "example": "He sought help from his teacher."}, {"word": "sold", "phonetic": "/soʊld/", "pos": "v.", "meaning": "卖（sell的过去式）", "example": "He sold his old bike."}, {"word": "sent", "phonetic": "/sɛnt/", "pos": "v.", "meaning": "送/寄（send的过去式）", "example": "I sent a letter to my friend."}, {"word": "set", "phonetic": "/sɛt/", "pos": "v.", "meaning": "安置（过去式）", "example": "I set the table for dinner."}, {"word": "sewed", "phonetic": "/soʊd/", "pos": "v.", "meaning": "缝合（sew的过去式）", "example": "My grandma sewed a dress."}, {"word": "shook", "phonetic": "/ʃʊk/", "pos": "v.", "meaning": "摇（shake的过去式）", "example": "I shook the bottle."}, {"word": "should", "phonetic": "/ʃʊd/", "pos": "v.", "meaning": "将（shall的过去式）", "example": "I said I should go."}, {"word": "shone", "phonetic": "/ʃoʊn/", "pos": "v.", "meaning": "发光（shine的过去式）", "example": "The sun shone brightly."}, {"word": "shot", "phonetic": "/ʃɑːt/", "pos": "v.", "meaning": "放炮（shoot的过去式）", "example": "He shot the ball into the goal."}, {"word": "showed", "phonetic": "/ʃoʊd/", "pos": "v.", "meaning": "显露（show的过去式）", "example": "She showed me her photo."}, {"word": "sang", "phonetic": "/sæŋ/", "pos": "v.", "meaning": "唱歌（sing的过去式）", "example": "I sang a song."}, {"word": "sank / sunk", "phonetic": "/sæŋk/ /sʌŋk/", "pos": "v.", "meaning": "下沉（sink的过去式）", "example": "The boat sank in the water."}, {"word": "sat", "phonetic": "/sæt/", "pos": "v.", "meaning": "坐（sit的过去式）", "example": "I sat on the chair."}, {"word": "slept", "phonetic": "/slɛpt/", "pos": "v.", "meaning": "睡（sleep的过去式）", "example": "I slept well last night."}, {"word": "smelt", "phonetic": "/smɛlt/", "pos": "v.", "meaning": "发出气味（smell的过去式）", "example": "The flower smelt sweet."}, {"word": "sowed", "phonetic": "/soʊd/", "pos": "v.", "meaning": "种植（sow的过去式）", "example": "The farmer sowed the seeds."}, {"word": "spoke", "phonetic": "/spoʊk/", "pos": "v.", "meaning": "说（speak的过去式）", "example": "I spoke to my teacher."}, {"word": "spelt / spelled", "phonetic": "/spɛlt/ /spɛld/", "pos": "v.", "meaning": "拼写（spell的过去式）", "example": "I spelt my name correctly."}, {"word": "spent", "phonetic": "/spɛnt/", "pos": "v.", "meaning": "花费（spend的过去式）", "example": "I spent 10 yuan."}, {"word": "spat / spit", "phonetic": "/spæt/ /spɪt/", "pos": "v.", "meaning": "吐出（spit的过去式）", "example": "He spat out the gum."}, {"word": "sprang / sprung", "phonetic": "/spræŋ/ /sprʌŋ/", "pos": "v.", "meaning": "跳跃（spring的过去式）", "example": "The cat sprang onto the sofa."}, {"word": "stood", "phonetic": "/stʊd/", "pos": "v.", "meaning": "站立（stand的过去式）", "example": "I stood up and answered."}, {"word": "stole", "phonetic": "/stoʊl/", "pos": "v.", "meaning": "偷（steal的过去式）", "example": "Someone stole my bag."}, {"word": "swept", "phonetic": "/swɛpt/", "pos": "v.", "meaning": "打扫（sweep的过去式）", "example": "I swept the floor."}, {"word": "swam", "phonetic": "/swæm/", "pos": "v.", "meaning": "游泳（swim的过去式）", "example": "I swam in the pool."}, {"word": "took", "phonetic": "/tʊk/", "pos": "v.", "meaning": "拿（take的过去式）", "example": "I took a photo."}, {"word": "taught", "phonetic": "/tɔːt/", "pos": "v.", "meaning": "教（teach的过去式）", "example": "My teacher taught me English."}, {"word": "tore", "phonetic": "/tɔːr/", "pos": "v.", "meaning": "撕裂（tear的过去式）", "example": "I tore the paper by mistake."}, {"word": "told", "phonetic": "/toʊld/", "pos": "v.", "meaning": "告诉（tell的过去式）", "example": "I told my mum the truth."}, {"word": "thought", "phonetic": "/θɔːt/", "pos": "v.", "meaning": "思考（think的过去式）", "example": "I thought about the problem."}, {"word": "threw", "phonetic": "/θruː/", "pos": "v.", "meaning": "投/扔（throw的过去式）", "example": "I threw the ball."}, {"word": "understood", "phonetic": "/ˌʌndərˈstʊd/", "pos": "v.", "meaning": "了解（understand的过去式）", "example": "I understood the question."}, {"word": "woke / waked", "phonetic": "/woʊk/ /weɪkt/", "pos": "v.", "meaning": "醒着（wake的过去式）", "example": "I woke up at 7 o'clock."}, {"word": "wore", "phonetic": "/wɔːr/", "pos": "v.", "meaning": "穿着（wear的过去式）", "example": "I wore a red dress."}, {"word": "wet / wetted", "phonetic": "/wɛt/ /ˈwɛtɪd/", "pos": "v.", "meaning": "淋湿（过去式）", "example": "The rain wet my clothes."}, {"word": "won", "phonetic": "/wʌn/", "pos": "v.", "meaning": "获胜（win的过去式）", "example": "Our team won the game."}, {"word": "wrote", "phonetic": "/roʊt/", "pos": "v.", "meaning": "书写（write的过去式）", "example": "I wrote a letter."}];
 var idx=0;
 var spellIdx=0;
@@ -169,90 +175,240 @@ var reviewedQueue=[];
 var reviewMode=false;
 var reviewedMode=false;
 
-// 从 localStorage 恢复队列
-(function(){try{wrongQueue=JSON.parse(localStorage.getItem(WRONG_STORE))||[];}catch(e){wrongQueue=[];}try{reviewedQueue=JSON.parse(localStorage.getItem(REVIEWED_STORE))||[];}catch(e){reviewedQueue=[];}})();
+// 从 localStorage 恢复全部状态
+(function(){
+try{wrongQueue=JSON.parse(localStorage.getItem(WRONG_STORE))||[];}catch(e){wrongQueue=[];}
+try{reviewedQueue=JSON.parse(localStorage.getItem(REVIEWED_STORE))||[];}catch(e){reviewedQueue=[];}
+try{
+  var savedIdx=parseInt(localStorage.getItem(CUR_IDX_KEY));
+  if(!isNaN(savedIdx)&&savedIdx>=0) idx=savedIdx;
+}catch(e){}
+try{
+  var savedSpell=parseInt(localStorage.getItem(SPELL_IDX_KEY));
+  if(!isNaN(savedSpell)&&savedSpell>=0) spellIdx=savedSpell;
+}catch(e){}
+})();
 
-function saveQueues(){localStorage.setItem(WRONG_STORE,JSON.stringify(wrongQueue));localStorage.setItem(REVIEWED_STORE,JSON.stringify(reviewedQueue));}
+function saveIndex(){
+  try{localStorage.setItem(CUR_IDX_KEY,String(idx));}catch(e){}
+  try{localStorage.setItem(SPELL_IDX_KEY,String(spellIdx));}catch(e){}
+}
+function saveQueues(){
+  localStorage.setItem(WRONG_STORE,JSON.stringify(wrongQueue));
+  localStorage.setItem(REVIEWED_STORE,JSON.stringify(reviewedQueue));
+}
 
-document.getElementById("tot").textContent=words.length;
+function switchTab(tab){
+  document.getElementById("tabBrowse").classList.toggle("active",tab==="browse");
+  document.getElementById("tabSpell").classList.toggle("active",tab==="spell");
+  document.getElementById("browseCard").style.display=tab==="browse"?"block":"none";
+  document.getElementById("spellCard").style.display=tab==="spell"?"block":"none";
+}
 
-function speak(text){try{var fname=text.replace(/\//g,'').replace(/'/g,'').replace(/[()]/g,'').replace(/&/g,'and').replace(/\s+/g,'_').replace(/_+/g,'_')+'.mp3';var a=new Audio('audio/'+fname);a.volume=1;a.play();}catch(e){try{var u=new SpeechSynthesisUtterance(text);u.lang='en-US';speechSynthesis.speak(u);}catch(e2){}}}
-
-function load(){var w=words[idx];document.getElementById("word").textContent=w.word;document.getElementById("phonetic").textContent=w.phonetic;document.getElementById("pos").textContent=w.pos;document.getElementById("pos2").textContent=w.pos;document.getElementById("meaning").textContent=w.meaning;document.getElementById("example").textContent=w.example;document.getElementById("cur").textContent=idx+1;document.getElementById("card").classList.remove("flipped");updateFav();}
+// ===== 浏览模式 =====
+function load(){
+  var w=words[idx];
+  document.getElementById("word").textContent=w.word;
+  document.getElementById("phonetic").textContent=w.phonetic;
+  document.getElementById("pos").textContent=w.pos;
+  document.getElementById("pos2").textContent=w.pos;
+  document.getElementById("meaning").textContent=w.meaning;
+  document.getElementById("example").textContent=w.example;
+  document.getElementById("cur").textContent=idx+1;
+  document.getElementById("card").classList.remove("flipped");
+  updateFav();
+  saveIndex();
+  // 显示断点条
+  updateResumeBar();
+}
 function flip(){document.getElementById("card").classList.toggle("flipped");}
 function next(){idx=(idx+1)%words.length;load();}
 function prev(){idx=(idx-1+words.length)%words.length;load();}
 function rand(){var n;do{n=Math.floor(Math.random()*words.length);}while(n===idx&&words.length>1);idx=n;load();}
 
-function updateStats(){document.getElementById("sCorrect").textContent=spellCorrect;document.getElementById("sTotal").textContent=spellTotal;document.getElementById("sWrong").textContent=wrongQueue.length;document.getElementById("reviewCount").textContent=wrongQueue.length;document.getElementById("reviewedCount").textContent=reviewedQueue.length;document.getElementById("btnReview").disabled=wrongQueue.length===0;document.getElementById("btnReviewed").disabled=reviewedQueue.length===0;}
-
-function loadSpell(){var w=words[spellIdx];document.getElementById("sMeaning").textContent=w.meaning;document.getElementById("sPos").textContent=w.pos;document.getElementById("sPhonetic").textContent=w.phonetic;var inp=document.getElementById("spellInput");inp.value="";inp.classList.remove("correct","wrong");inp.disabled=false;document.getElementById("sFeedback").textContent="";document.getElementById("sFeedback").className="spell-feedback";updateStats();spellAnswered=false;setTimeout(function(){inp.focus();},100);}
-
-function submitSpell(){if(spellAnswered)return;var inp=document.getElementById("spellInput");var ans=inp.value.trim().toLowerCase();var correct=words[spellIdx].word.toLowerCase();var fb=document.getElementById("sFeedback");spellTotal++;if(ans===correct){spellCorrect++;inp.classList.add("correct");inp.disabled=true;fb.textContent="✓ 答对了!";fb.className="spell-feedback correct";spellAnswered=true;speak(words[spellIdx].word);
-if(reviewedMode){
-// 已复习专练: 答对不做额外处理
-}else if(reviewMode){
-// 错词专项: 答对 → 移出错词, 加入已复习
-var wIdx=wrongQueue.indexOf(spellIdx);if(wIdx>=0)wrongQueue.splice(wIdx,1);if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();
-if(wrongQueue.length===0){setTimeout(function(){alert("恭喜! 错词全部掌握!");exitReviewMode();},1500);return;}
-}else{
-// 普通模式: 答对 且 不在错词队列 → 加入已复习
-if(wrongQueue.indexOf(spellIdx)<0){if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();}
+function updateResumeBar(){
+  var bar=document.getElementById("resumeBar");
+  if(idx>0){
+    bar.style.display="flex";
+    document.getElementById("resumeWord").textContent="第 "+idx+" 个 · "+(words[idx]?.word||"");
+  }else{
+    bar.style.display="none";
+  }
 }
-setTimeout(function(){spellNext();},1500);}else{inp.classList.add("wrong");fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
-if(!reviewedMode){
-// 加入错词, 从已复习移出
-if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();
-}}updateStats();}
+function jumpToSaved(){
+  // 已经通过 restore 在 idx 上了，直接加载
+  load();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
 
-function skipSpell(){if(spellAnswered)return;var fb=document.getElementById("sFeedback");fb.innerHTML="答案是 <strong>"+words[spellIdx].word+"</strong>";fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;document.getElementById("spellInput").disabled=true;
-if(!reviewedMode){if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();}
-updateStats();speak(words[spellIdx].word);}
+// ===== 拼写模式 =====
+function updateStats(){
+  document.getElementById("sCorrect").textContent=spellCorrect;
+  document.getElementById("sTotal").textContent=spellTotal;
+  document.getElementById("sWrong").textContent=wrongQueue.length;
+  document.getElementById("reviewCount").textContent=wrongQueue.length;
+  document.getElementById("reviewedCount").textContent=reviewedQueue.length;
+  document.getElementById("btnReview").disabled=wrongQueue.length===0;
+  document.getElementById("btnReviewed").disabled=reviewedQueue.length===0;
+}
+function loadSpell(){
+  var w=words[spellIdx];
+  document.getElementById("sMeaning").textContent=w.meaning;
+  document.getElementById("sPos").textContent=w.pos;
+  document.getElementById("sPhonetic").textContent=w.phonetic;
+  var inp=document.getElementById("spellInput");
+  inp.value="";inp.classList.remove("correct","wrong");inp.disabled=false;
+  document.getElementById("sFeedback").textContent="";
+  document.getElementById("sFeedback").className="spell-feedback";
+  updateStats();spellAnswered=false;
+  setTimeout(function(){inp.focus();},100);
+  saveIndex();
+}
+function submitSpell(){
+  if(spellAnswered)return;
+  var inp=document.getElementById("spellInput");
+  var ans=inp.value.trim().toLowerCase();
+  var correct=words[spellIdx].word.toLowerCase();
+  var fb=document.getElementById("sFeedback");
+  spellTotal++;
+  if(ans===correct){
+    spellCorrect++;inp.classList.add("correct");inp.disabled=true;
+    fb.textContent="✓ 答对了!";fb.className="spell-feedback correct";
+    spellAnswered=true;speak(words[spellIdx].word);
+    if(reviewedMode){
+      // 已复习专练: 不处理
+    }else if(reviewMode){
+      var wIdx=wrongQueue.indexOf(spellIdx);if(wIdx>=0)wrongQueue.splice(wIdx,1);
+      if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();
+      if(wrongQueue.length===0){setTimeout(function(){alert("恭喜! 错词全部掌握!");exitReviewMode();},1500);return;}
+    }else{
+      if(wrongQueue.indexOf(spellIdx)<0){if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();}
+    }
+    setTimeout(function(){spellNext();},1500);
+  }else{
+    inp.classList.add("wrong");
+    fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");
+    fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
+    if(!reviewedMode){
+      if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);
+      var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();
+    }
+  }
+  updateStats();
+}
+function skipSpell(){
+  if(spellAnswered)return;
+  var fb=document.getElementById("sFeedback");
+  fb.innerHTML="答案是 <strong>"+words[spellIdx].word+"</strong>";
+  fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;
+  document.getElementById("spellInput").disabled=true;
+  if(!reviewedMode){
+    if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);
+    var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();
+  }
+  updateStats();speak(words[spellIdx].word);
+}
+function spellNext(){
+  if(reviewedMode){
+    if(reviewedQueue.length===0){alert("已复习单词练完啦!");exitReviewedMode();return;}
+    var randIdx=Math.floor(Math.random()*reviewedQueue.length);spellIdx=reviewedQueue[randIdx];
+  }else if(reviewMode){
+    if(wrongQueue.length===0){alert("恭喜! 错词全部掌握!");exitReviewMode();return;}
+    var randIdx=Math.floor(Math.random()*wrongQueue.length);spellIdx=wrongQueue[randIdx];
+  }else{
+    spellIdx=(spellIdx+1)%words.length;
+  }
+  loadSpell();
+}
+function enterReviewMode(){
+  if(wrongQueue.length===0){alert("还没有错词哦, 先答错几个再来吧!");return;}
+  reviewMode=true;
+  document.getElementById("modeIndicator").textContent="📕 错词专项复习";
+  document.getElementById("spellCard").classList.add("review-mode");
+  document.getElementById("btnReview").style.display="none";
+  document.getElementById("btnExitReview").style.display="block";
+  document.getElementById("btnReviewed").style.display="none";
+  document.getElementById("btnExitReviewed").style.display="none";
+  document.getElementById("progressInfo").innerHTML="<strong>错词专项 · 待掌握 "+wrongQueue.length+" 个</strong>";
+  var randIdx=Math.floor(Math.random()*wrongQueue.length);spellIdx=wrongQueue[randIdx];loadSpell();
+}
+function exitReviewMode(){
+  reviewMode=false;
+  document.getElementById("modeIndicator").textContent="✍️ 拼写模式";
+  document.getElementById("spellCard").classList.remove("review-mode");
+  document.getElementById("btnReview").style.display="block";
+  document.getElementById("btnExitReview").style.display="none";
+  document.getElementById("btnReviewed").style.display="block";
+  document.getElementById("btnExitReviewed").style.display="none";
+  document.getElementById("progressInfo").innerHTML='第 <span id="cur">1</span> / <span id="tot">'+words.length+'</span> 个';
+  spellIdx=idx;loadSpell();
+}
+function enterReviewedMode(){
+  if(reviewedQueue.length===0){alert("还没有已复习单词哦, 先答对几个再来吧!");return;}
+  reviewedMode=true;
+  document.getElementById("modeIndicator").textContent="✅ 已复习专练";
+  document.getElementById("spellCard").classList.add("reviewed-mode");
+  document.getElementById("btnReviewed").style.display="none";
+  document.getElementById("btnExitReviewed").style.display="block";
+  document.getElementById("btnReview").style.display="none";
+  document.getElementById("btnExitReview").style.display="none";
+  document.getElementById("progressInfo").innerHTML="<strong>已复习专练 · "+reviewedQueue.length+" 个</strong>";
+  var randIdx=Math.floor(Math.random()*reviewedQueue.length);spellIdx=reviewedQueue[randIdx];loadSpell();
+}
+function exitReviewedMode(){
+  reviewedMode=false;
+  document.getElementById("modeIndicator").textContent="✍️ 拼写模式";
+  document.getElementById("spellCard").classList.remove("reviewed-mode");
+  document.getElementById("btnReviewed").style.display="block";
+  document.getElementById("btnExitReviewed").style.display="none";
+  document.getElementById("btnReview").style.display="block";
+  document.getElementById("btnExitReview").style.display="none";
+  document.getElementById("progressInfo").innerHTML='第 <span id="cur">1</span> / <span id="tot">'+words.length+'</span> 个';
+  spellIdx=idx;loadSpell();
+}
 
-function spellNext(){if(reviewedMode){if(reviewedQueue.length===0){alert("已复习单词练完啦!");exitReviewedMode();return;}var randIdx=Math.floor(Math.random()*reviewedQueue.length);spellIdx=reviewedQueue[randIdx];}else if(reviewMode){if(wrongQueue.length===0){alert("恭喜! 错词全部掌握!");exitReviewMode();return;}var randIdx=Math.floor(Math.random()*wrongQueue.length);spellIdx=wrongQueue[randIdx];}else{spellIdx=(spellIdx+1)%words.length;}loadSpell();}
-
-function enterReviewMode(){if(wrongQueue.length===0){alert("还没有错词哦, 先答错几个再来吧!");return;}reviewMode=true;document.getElementById("spellCard").classList.add("review-mode");document.getElementById("btnReview").style.display="none";document.getElementById("btnExitReview").style.display="block";document.getElementById("btnReviewed").style.display="none";document.getElementById("progressInfo").innerHTML="<strong>错词专项 · 待掌握 "+wrongQueue.length+" 个</strong>";var randIdx=Math.floor(Math.random()*wrongQueue.length);spellIdx=wrongQueue[randIdx];loadSpell();}
-
-function exitReviewMode(){reviewMode=false;document.getElementById("spellCard").classList.remove("review-mode");document.getElementById("btnReview").style.display="block";document.getElementById("btnExitReview").style.display="none";document.getElementById("btnReviewed").style.display="block";document.getElementById("progressInfo").innerHTML='第 <span id="cur">1</span> / <span id="tot">'+words.length+'</span> 个';spellIdx=0;loadSpell();}
-
-function enterReviewedMode(){if(reviewedQueue.length===0){alert("还没有已复习单词哦, 先答对几个再来吧!");return;}reviewedMode=true;document.getElementById("spellCard").classList.add("reviewed-mode");document.getElementById("btnReviewed").style.display="none";document.getElementById("btnExitReviewed").style.display="block";document.getElementById("btnReview").style.display="none";document.getElementById("progressInfo").innerHTML="<strong>已复习专练 · "+reviewedQueue.length+" 个</strong>";var randIdx=Math.floor(Math.random()*reviewedQueue.length);spellIdx=reviewedQueue[randIdx];loadSpell();}
-
-function exitReviewedMode(){reviewedMode=false;document.getElementById("spellCard").classList.remove("reviewed-mode");document.getElementById("btnReviewed").style.display="block";document.getElementById("btnExitReviewed").style.display="none";document.getElementById("btnReview").style.display="block";document.getElementById("progressInfo").innerHTML='第 <span id="cur">1</span> / <span id="tot">'+words.length+'</span> 个';spellIdx=0;loadSpell();}
-
-function switchMode(mode){if(mode==="browse"){document.getElementById("tabBrowse").classList.add("active");document.getElementById("tabSpell").classList.remove("active");document.getElementById("modeBrowse").classList.add("active");document.getElementById("modeSpell").classList.remove("active");}else{document.getElementById("tabBrowse").classList.remove("active");document.getElementById("tabSpell").classList.add("active");document.getElementById("modeBrowse").classList.remove("active");document.getElementById("modeSpell").classList.add("active");loadSpell();}}
-
+// ===== 收藏 =====
 function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY))||[];}catch(e){return [];}}
 function saveFavs(f){localStorage.setItem(FAV_KEY,JSON.stringify(f));}
-function toggleFav(e){e.stopPropagation();var favs=getFavs();var w=words[idx];var i=-1;for(var k=0;k<favs.length;k++){if(favs[k].word===w.word){i=k;break;}}if(i>=0){favs.splice(i,1);}else{favs.push(w);}saveFavs(favs);updateFav();updateCount();}
-function updateFav(){var favs=getFavs();var isFav=false;for(var k=0;k<favs.length;k++){if(favs[k].word===words[idx].word){isFav=true;break;}}var b=document.getElementById("favBtn");b.textContent=isFav?"♥":"♡";b.classList.toggle("on",isFav);}
-function updateCount(){document.getElementById("favCount").textContent=getFavs().length;}
-function showFavs(){var favs=getFavs();var list=document.getElementById("favList");if(favs.length===0){list.innerHTML='<div class="empty-state">还没收藏过单词</div>';}else{var h="";for(var i=0;i<favs.length;i++){var f=favs[i];h+='<li class="fav-item"><div class="fav-word"><strong>'+f.word+'</strong><span>'+f.phonetic+' '+f.meaning+'</span></div><button class="remove-btn" data-word="'+f.word+'">移除</button></li>';}list.innerHTML=h;var btns=list.querySelectorAll(".remove-btn");for(var j=0;j<btns.length;j++){btns[j].addEventListener("click",function(){removeFav(this.getAttribute("data-word"));});}}document.getElementById("modal").classList.add("show");}
-function closeFavs(){document.getElementById("modal").classList.remove("show");}
-function removeFav(w){var favs=getFavs();var newFavs=[];for(var k=0;k<favs.length;k++){if(favs[k].word!==w)newFavs.push(favs[k]);}saveFavs(newFavs);showFavs();updateFav();updateCount();}
+function toggleFav(e){
+  e.stopPropagation();
+  var favs=getFavs();var w=words[idx];var i=-1;
+  for(var k=0;k<favs.length;k++){if(favs[k].word===w.word){i=k;break;}}
+  if(i>=0){favs.splice(i,1);}else{favs.push(w);}
+  saveFavs(favs);updateFav();
+}
+function updateFav(){
+  var w=words[idx];var favs=getFavs();var found=false;
+  for(var k=0;k<favs.length;k++){if(favs[k].word===w.word){found=true;break;}}
+  document.getElementById("favBtn").textContent=found?"❤️":"♡";
+}
 
-document.getElementById("card").addEventListener("click",flip);
-document.getElementById("favBtn").addEventListener("click",toggleFav);
-document.getElementById("speakBtn1").addEventListener("click",function(e){e.stopPropagation();speak(words[idx].word);});
-document.getElementById("speakBtn2").addEventListener("click",function(e){e.stopPropagation();speak(words[idx].word);});
-document.getElementById("btnPrev").addEventListener("click",prev);
-document.getElementById("btnNext").addEventListener("click",next);
-document.getElementById("btnRandom").addEventListener("click",rand);
-document.getElementById("btnViewFav").addEventListener("click",showFavs);
-document.getElementById("btnClose").addEventListener("click",closeFavs);
-document.getElementById("modal").addEventListener("click",function(e){if(e.target===this)closeFavs();});
-document.getElementById("tabBrowse").addEventListener("click",function(){switchMode("browse");});
-document.getElementById("tabSpell").addEventListener("click",function(){switchMode("spell");});
-document.getElementById("btnSubmit").addEventListener("click",submitSpell);
-document.getElementById("btnSkip").addEventListener("click",skipSpell);
-document.getElementById("btnSpellNext").addEventListener("click",spellNext);
-document.getElementById("btnReview").addEventListener("click",enterReviewMode);
-document.getElementById("btnExitReview").addEventListener("click",exitReviewMode);
-document.getElementById("btnReviewed").addEventListener("click",enterReviewedMode);
-document.getElementById("btnExitReviewed").addEventListener("click",exitReviewedMode);
-document.getElementById("spellSpeakBtn").addEventListener("click",function(){speak(words[spellIdx].word);});
-document.getElementById("spellInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();if(spellAnswered){spellNext();}else{submitSpell();}}});
+// ===== 发音 =====
+function speak(text){
+  if(!text)return;
+  try{
+    var fname=text.replace(/\//g,'').replace(/'/g,'').replace(/[()]/g,'').replace(/&/g,'and').replace(/\s+/g,'_').replace(/_+/g,'_')+'.mp3';
+    var a=new Audio('audio/'+fname);a.volume=1;a.play();
+  }catch(e){
+    try{var u=new SpeechSynthesisUtterance(text);u.lang='en-US';speechSynthesis.speak(u);}catch(e2){}
+  }
+}
 
-load();updateCount();updateStats();
+// ===== 重置 =====
+function resetAll(){
+  if(!confirm("确定要清除所有进度（错词/已复习/当前位置）吗？"))return;
+  localStorage.removeItem(WRONG_STORE);
+  localStorage.removeItem(REVIEWED_STORE);
+  localStorage.removeItem(FAV_KEY);
+  localStorage.removeItem(CUR_IDX_KEY);
+  localStorage.removeItem(SPELL_IDX_KEY);
+  wrongQueue=[];reviewedQueue=[];idx=0;spellIdx=0;spellCorrect=0;spellTotal=0;
+  load();loadSpell();
+  document.getElementById("resumeBar").style.display="none";
+}
+
+// ===== 初始化 =====
+
 </script>
 </body>
 </html>
