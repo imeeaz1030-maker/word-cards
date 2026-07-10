@@ -154,7 +154,7 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 </div>
 
 <script>
-var CARD_KEY="4B总归纳卡";
+var CARD_KEY="4B总归纳卡";var VER="v3";
 var WRONG_STORE="flashcard_wrong_"+CARD_KEY;
 var REVIEWED_STORE="flashcard_reviewed_"+CARD_KEY;
 var FAV_KEY="flashcard_favs_"+CARD_KEY;
@@ -199,13 +199,13 @@ if(wrongQueue.length===0){setTimeout(function(){alert("恭喜! 错词全部掌�
 // 普通模式: 答对 且 不在错词队列 → 加入已复习
 if(wrongQueue.indexOf(spellIdx)<0){if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();}
 }
-setTimeout(function(){spellNext();},1500);}else{inp.classList.add("wrong");fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
+setTimeout(function(){spellNext();},1500);}else{inp.classList.add("wrong");var allForms=correctForms;if(allForms.length>1){fb.innerHTML="✗ 拼错了, 应该是 <strong>"+allForms.join(" 或 ")+"</strong><br>你写的: "+(ans||"(空)");}else{fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");}fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
 if(!reviewedMode){
 // 加入错词, 从已复习移出
 if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();
 }}updateStats();}
 
-function skipSpell(){if(spellAnswered)return;var fb=document.getElementById("sFeedback");fb.innerHTML="答案是 <strong>"+words[spellIdx].word+"</strong>";fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;document.getElementById("spellInput").disabled=true;
+function skipSpell(){if(spellAnswered)return;var fb=document.getElementById("sFeedback");var correctW=words[spellIdx].word;var cForms=correctW.split('/').map(function(f){return f.trim();});var showAns=cForms.length>1?cForms.join(" 或 "):correctW;fb.innerHTML="答案是 <strong>"+showAns+"</strong>";fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;document.getElementById("spellInput").disabled=true;
 if(!reviewedMode){if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();}
 updateStats();speak(words[spellIdx].word);}
 
