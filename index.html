@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>单词打卡</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -154,7 +157,7 @@ body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradie
 </div>
 
 <script>
-var CARD_KEY="4B总归纳卡";var VER="v3";
+var CARD_KEY="4B总归纳卡";var VER="v4";
 var WRONG_STORE="flashcard_wrong_"+CARD_KEY;
 var REVIEWED_STORE="flashcard_reviewed_"+CARD_KEY;
 var FAV_KEY="flashcard_favs_"+CARD_KEY;
@@ -188,7 +191,7 @@ function updateStats(){document.getElementById("sCorrect").textContent=spellCorr
 
 function loadSpell(){var w=words[spellIdx];document.getElementById("sMeaning").textContent=w.meaning;document.getElementById("sPos").textContent=w.pos;document.getElementById("sPhonetic").textContent=w.phonetic;var inp=document.getElementById("spellInput");inp.value="";inp.classList.remove("correct","wrong");inp.disabled=false;document.getElementById("sFeedback").textContent="";document.getElementById("sFeedback").className="spell-feedback";updateStats();spellAnswered=false;setTimeout(function(){inp.focus();},100);}
 
-function submitSpell(){if(spellAnswered)return;var inp=document.getElementById("spellInput");var ans=inp.value.trim().toLowerCase();var correct=words[spellIdx].word.toLowerCase();var correctForms=correct.split('/').map(function(f){return f.trim();});var ansCorrect=correctForms.indexOf(ans)>=0;var fb=document.getElementById("sFeedback");spellTotal++;if(ansCorrect){spellCorrect++;inp.classList.add("correct");inp.disabled=true;fb.textContent="✓ 答对了!";fb.className="spell-feedback correct";spellAnswered=true;speak(words[spellIdx].word);
+function submitSpell(){if(spellAnswered)return;var inp=document.getElementById("spellInput");var ans=inp.value.trim().toLowerCase().replace(/[\/\s]+/g,' ').trim();var correct=words[spellIdx].word.toLowerCase();var validForms=correct.split(/[\/]+/).map(function(f){return f.trim().toLowerCase();});var ansCorrect=validForms.indexOf(ans)>=0||validForms.indexOf(ans.replace(/\s+/g,' '))>=0;var fb=document.getElementById("sFeedback");spellTotal++;if(ansCorrect){spellCorrect++;inp.classList.add("correct");inp.disabled=true;fb.textContent="✓ 答对了!";fb.className="spell-feedback correct";spellAnswered=true;speak(words[spellIdx].word);
 if(reviewedMode){
 // 已复习专练: 答对不做额外处理
 }else if(reviewMode){
@@ -199,13 +202,13 @@ if(wrongQueue.length===0){setTimeout(function(){alert("恭喜! 错词全部掌�
 // 普通模式: 答对 且 不在错词队列 → 加入已复习
 if(wrongQueue.indexOf(spellIdx)<0){if(reviewedQueue.indexOf(spellIdx)<0)reviewedQueue.push(spellIdx);saveQueues();}
 }
-setTimeout(function(){spellNext();},1500);}else{inp.classList.add("wrong");var allForms=correctForms;if(allForms.length>1){fb.innerHTML="✗ 拼错了, 应该是 <strong>"+allForms.join(" 或 ")+"</strong><br>你写的: "+(ans||"(空)");}else{fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");}fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
+setTimeout(function(){spellNext();},1500);}else{inp.classList.add("wrong");var allForms=validForms;if(allForms.length>1){fb.innerHTML="✗ 拼错了, 应该是 <strong>"+allForms.join(" 或 ")+"</strong><br>你写的: "+(ans||"(空)");}else{fb.innerHTML="✗ 拼错了, 应该是 <strong>"+words[spellIdx].word+"</strong><br>你写的: "+(ans||"(空)");}fb.className="spell-feedback wrong";spellAnswered=true;speak(words[spellIdx].word);
 if(!reviewedMode){
 // 加入错词, 从已复习移出
 if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();
 }}updateStats();}
 
-function skipSpell(){if(spellAnswered)return;var fb=document.getElementById("sFeedback");var correctW=words[spellIdx].word;var cForms=correctW.split('/').map(function(f){return f.trim();});var showAns=cForms.length>1?cForms.join(" 或 "):correctW;fb.innerHTML="答案是 <strong>"+showAns+"</strong>";fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;document.getElementById("spellInput").disabled=true;
+function skipSpell(){if(spellAnswered)return;var fb=document.getElementById("sFeedback");var correctW=words[spellIdx].word;var sForms=correctW.split('/').map(function(f){return f.trim();});var showAns=sForms.length>1?sForms.join(" 或 "):correctW;fb.innerHTML="答案是 <strong>"+showAns+"</strong>";fb.className="spell-feedback wrong";spellTotal++;spellAnswered=true;document.getElementById("spellInput").disabled=true;
 if(!reviewedMode){if(wrongQueue.indexOf(spellIdx)<0)wrongQueue.push(spellIdx);var rIdx=reviewedQueue.indexOf(spellIdx);if(rIdx>=0)reviewedQueue.splice(rIdx,1);saveQueues();}
 updateStats();speak(words[spellIdx].word);}
 
