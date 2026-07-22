@@ -179,7 +179,7 @@ function saveQueues(){localStorage.setItem(WRONG_STORE,JSON.stringify(wrongQueue
 
 document.getElementById("tot").textContent=words.length;
 
-function speak(text){try{var fname=text.replace(/\//g,'').replace(/'/g,'').replace(/[()]/g,'').replace(/&/g,'and').replace(/\s+/g,'_').replace(/_+/g,'_')+'.mp3';var a=new Audio('audio/'+fname);a.volume=1;a.play();}catch(e){try{var u=new SpeechSynthesisUtterance(text);u.lang='en-US';speechSynthesis.speak(u);}catch(e2){}}}
+function speak(text){try{var fname=text.replace(/\//g,'').replace(/'/g,'').replace(/[()]/g,'').replace(/&/g,'and').replace(/\s+/g,'_').replace(/_+/g,'_')+'.mp3';var a=new Audio('audio/'+fname);a.volume=1;a.play().catch(function(){try{var u=new SpeechSynthesisUtterance(text);u.lang='en-US';speechSynthesis.speak(u);}catch(e2){}});}catch(e){try{var u=new SpeechSynthesisUtterance(text);u.lang='en-US';speechSynthesis.speak(u);}catch(e2){}}}
 
 function load(){var w=words[idx];document.getElementById("word").textContent=w.word;document.getElementById("phonetic").textContent=w.phonetic;document.getElementById("pos").textContent=w.pos;document.getElementById("pos2").textContent=w.pos;document.getElementById("meaning").textContent=w.meaning;document.getElementById("example").textContent=w.example;document.getElementById("cur").textContent=idx+1;document.getElementById("card").classList.remove("flipped");updateFav();}
 function flip(){document.getElementById("card").classList.toggle("flipped");}
