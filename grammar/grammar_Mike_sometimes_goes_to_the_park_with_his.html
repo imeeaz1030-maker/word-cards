@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <title>句子实验室</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -250,7 +254,27 @@ function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=c
 var _gvoice=null;
 function _pickVoice(){var vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}var pref=['Sonia','Daniel','Kate','Serena','Arthur','Google UK English Female','Google UK English Male'];for(var p=0;p<pref.length;p++)for(var i=0;i<vs.length;i++)if(vs[i].name&&vs[i].name.indexOf(pref[p])>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.replace('_','-').indexOf('en-GB')>=0)return vs[i];for(var i=0;i<vs.length;i++)if(vs[i].lang&&vs[i].lang.indexOf('en')>=0)return vs[i];return null;}
 try{if(typeof speechSynthesis!=='undefined'){_gvoice=_pickVoice();speechSynthesis.onvoiceschanged=function(){_gvoice=_pickVoice();};}}catch(e){}
-function speak(text,rate){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);if(!_gvoice)_gvoice=_pickVoice();if(_gvoice)u.voice=_gvoice;u.lang=(_gvoice&&_gvoice.lang)?_gvoice.lang:'en-GB';u.rate=rate||0.95;u.pitch=1;setTimeout(function(){try{speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){}},60);}catch(e){}}
+function _audioname(t){return t.replace(/\//g,'').replace(/'/g,'').replace(/[()]/g,'').replace(/&/g,'and').replace(/\s+/g,'_').replace(/_+/g,'_')+'.mp3';}
+function speak(text,rate){
+  // MP3 优先（iOS/安卓都稳），失败再退回浏览器语音合成
+  try{
+    var a=new Audio('audio/'+_audioname(text));
+    if(rate&&rate!==1) a.playbackRate=rate;
+    var p=a.play();
+    if(p&&p.catch){p.catch(function(){_tts(text,rate);});}
+  }catch(e){_tts(text,rate);}
+}
+function _tts(text,rate){
+  try{
+    var u=new SpeechSynthesisUtterance(text);
+    if(!_gvoice){try{_gvoice=_pickVoice();}catch(e){}}
+    if(_gvoice)u.voice=_gvoice;
+    u.lang=(_gvoice&&_gvoice.lang)?_gvoice.lang:'en-GB';
+    u.rate=rate||0.95;u.pitch=1;
+    // ⚠️ 不能再包 setTimeout：iOS 会丢失用户手势，直接静音
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
 
 function renderChunks(s){
   var c=el("div","card");
